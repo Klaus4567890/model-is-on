@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LED Steuerung</title>
+  <style>
+    button { font-size: 18px; padding: 10px; margin: 5px; }
+  </style>
+</head>
+<body>
+  <h1>LEDs Steuern</h1>
+  <button id="led1-on">LED 1 EIN</button>
+  <button id="led1-off">LED 1 AUS</button>
+  <button id="led2-on">LED 2 EIN</button>
+  <button id="led2-off">LED 2 AUS</button>
+  <button id="led3-on">LED 3 EIN</button>
+  <button id="led3-off">LED 3 AUS</button>
+  <button id="led4-on">LED 4 EIN</button>
+  <button id="led4-off">LED 4 AUS</button>
+
+  <script>
+    let port;
+
+    // Verbindung zum seriellen Port herstellen
+    async function connectSerial() {
+      if ("serial" in navigator) {
+        try {
+          port = await navigator.serial.requestPort();
+          await port.open({ baudRate: 9600 });
+        } catch (err) {
+          console.error('Verbindung zum seriellen Port fehlgeschlagen', err);
+        }
+      } else {
+        alert("Die Web Serial API wird von diesem Browser nicht unterstützt.");
+      }
+    }
+
+    // Befehl an den Arduino senden
+    function sendCommand(command) {
+      if (port && port.writable) {
+        const writer = port.writable.getWriter();
+        writer.write(new TextEncoder().encode(command));
+        writer.releaseLock();
+      }
+    }
+
+    // Event-Listener für die Buttons
+    document.getElementById("led1-on").addEventListener("click", () => sendCommand('1'));
+    document.getElementById("led1-off").addEventListener("click", () => sendCommand('2'));
+    document.getElementById("led2-on").addEventListener("click", () => sendCommand('3'));
+    document.getElementById("led2-off").addEventListener("click", () => sendCommand('4'));
+    document.getElementById("led3-on").addEventListener("click", () => sendCommand('5'));
+    document.getElementById("led3-off").addEventListener("click", () => sendCommand('6'));
+    document.getElementById("led4-on").addEventListener("click", () => sendCommand('7'));
+    document.getElementById("led4-off").addEventListener("click", () => sendCommand('8'));
+
+    // Verbindung beim Laden der Seite herstellen
+    connectSerial();
+  </script>
+</body>
+</html>
